@@ -1,4 +1,4 @@
-merb_composer
+merb_component
 =============
 
 Merb plugin that provides composition of controllers.

@@ -1,5 +1,5 @@
 TODO:
 Fix LICENSE with your name
 Fix Rakefile with your name and contact info
-Add your code to lib/merb_composer.rb
-Add your Merb rake tasks to lib/merb_composer/merbtasks.rb
+Add your code to lib/merb_component.rb
+Add your Merb rake tasks to lib/merb_component/merbtasks.rb
