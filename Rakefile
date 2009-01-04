@@ -4,7 +4,7 @@ require 'rake/gempackagetask'
 require 'merb-core'
 require 'merb-core/tasks/merb'
 
-GEM_NAME = "merb_composer"
+GEM_NAME = "merb_component"
 GEM_VERSION = "0.0.2"
 AUTHOR = "Genki Takiuchi"
 EMAIL = "genki@s21g.com"
