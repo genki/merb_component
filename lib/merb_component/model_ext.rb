@@ -11,7 +11,7 @@ module DataMapper::Model
   end
 
   def relation
-    Thread::current[:relation].last
+    (Thread::current[:relation] || []).last
   end
 
 private
