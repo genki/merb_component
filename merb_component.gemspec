@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{merb_component}
-  s.version = "0.0.3"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Genki Takiuchi"]
@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.description = %q{Merb plugin that provides composition of controllers.}
   s.email = %q{genki@s21g.com}
   s.extra_rdoc_files = ["README", "LICENSE", "TODO"]
-  s.files = ["LICENSE", "README", "Rakefile", "TODO", "lib/merb_component", "lib/merb_component/controller_ext.rb", "lib/merb_component/merbtasks.rb", "lib/merb_component.rb", "spec/merb_component_spec.rb", "spec/spec_helper.rb"]
+  s.files = ["LICENSE", "README", "Rakefile", "TODO", "lib/merb_component", "lib/merb_component/controller_ext.rb", "lib/merb_component/merbtasks.rb", "lib/merb_component/model_ext.rb", "lib/merb_component.rb", "spec/merb_component_spec.rb", "spec/spec_helper.rb"]
   s.has_rdoc = true
   s.homepage = %q{http://blog.s21g.com/genki}
   s.require_paths = ["lib"]

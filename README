@@ -2,3 +2,17 @@ merb_component
 =============
 
 Merb plugin that provides composition of controllers.
+
+Example of use:
+
+  Content of the user (id is 2) goes here
+  <%= component User, :show, :id => 2 %>
+
+  Index of posts related with the @user go here
+  <% Post.related_with @user do %>
+    <%= component Post, :index %>
+  <% end %>
+
+  In app/views/posts/index.html.erb,
+  You can access to the corresponding relation like this
+  <%= Post.relation #=> @user %>
