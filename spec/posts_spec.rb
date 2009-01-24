@@ -34,4 +34,15 @@ describe "Posts controller" do
     res.should have_xpath("//form[@method='post']")
     res.should have_xpath("//form[@action='/posts/#{@post.id}/comments']")
   end
+
+  it "should show html after post a comment" do
+    res = request(resource(@post, :comments),
+      :method => 'POST', :params => {:comment => {:id => nil}})
+    res.should be_successful
+    res.should have_xpath("//h1")
+    res.should have_xpath("//h2")
+    res.should have_xpath("//ul/li[1]")
+    res.should have_xpath("//ul/li[2]")
+    res.should have_xpath("//form[@method='post']")
+  end
 end
