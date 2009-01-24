@@ -7,10 +7,11 @@ class Merb::Controller
 
   class << self
   private
-    def aggregates(*args)
-      @aggregations ||= Mash.new
-      options = extract_options_from_args!(args) || {}
-      args.each do |arg|
+    def aggregates(aggregation, options = {})
+      if aggregation.is_a?(Symbol)
+        aggregation = {:show => aggregation}
+      end
+      aggregation.each do |action, arg|
         define_method(arg){} unless method_defined?(arg)
         model = Object.full_const_get(arg.to_s.singular.camel_case)
         key = "#{controller_name.singular}_id"
@@ -26,15 +27,17 @@ class Merb::Controller
 
           # call action of subsidiary controller with scope
           cc = Object.full_const_get(params[:action].camel_case).new(req)
-          model.send :with_scope, key => id do
+          scope = Mash.new
+          scope[key] = id if id
+          model.send :with_scope, scope do
             cc._abstract_dispatch(req.params[:action])
             result = cc.instance_variable_get(var)
             c.instance_variable_set(var, result)
           end
 
           # prepare for performing actoin of principal controller
-          params[:id] = id
-          params[:action] = c.action_name = :show
+          params[:id] = id if id
+          params[:action] = c.action_name = action
         }, :only => arg)
       end
     end

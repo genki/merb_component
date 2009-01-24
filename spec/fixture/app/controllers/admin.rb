@@ -1,8 +1,7 @@
 class Admin < Application
-  aggregates :comments
+  aggregates :show => :comments
 
-  def index
-    @comments = Comment.all
+  def show
     render
   end
 end
