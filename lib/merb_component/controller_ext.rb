@@ -1,9 +1,9 @@
 class Merb::Controller
-  REST_TABLE = {
+  METHOD_TO_ACTION = {
     :post => :create,
     :put => :update,
     :delete => :destroy
-  }
+  }.freeze
 
   class << self
   private
@@ -14,6 +14,7 @@ class Merb::Controller
         define_method(arg){} unless method_defined?(arg)
         model = Object.full_const_get(arg.to_s.singular.camel_case)
         key = "#{controller_name.singular}_id"
+        var = "@#{arg.to_s.singular}"
 
         add_filter(_before_filters, proc{|c|
           # setup request
@@ -21,13 +22,14 @@ class Merb::Controller
           req = request.dup
           req.reset_params!
           req.instance_variable_set(:@params, params.merge(
-            :controller => arg, :action => REST_TABLE[req.method]))
+            :controller => arg, :action => METHOD_TO_ACTION[req.method]))
 
           # call action of subsidiary controller with scope
           cc = Object.full_const_get(params[:action].camel_case).new(req)
           model.send :with_scope, key => id do
-            result = cc._abstract_dispatch(req.params[:action])
-            c.instance_variable_set("@#{arg.to_s.singular}", result)
+            cc._abstract_dispatch(req.params[:action])
+            result = cc.instance_variable_get(var)
+            c.instance_variable_set(var, result)
           end
 
           # prepare for performing actoin of principal controller

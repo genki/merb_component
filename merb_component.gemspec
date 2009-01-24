@@ -2,15 +2,15 @@
 
 Gem::Specification.new do |s|
   s.name = %q{merb_component}
-  s.version = "0.1.1"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Genki Takiuchi"]
-  s.date = %q{2009-01-05}
+  s.date = %q{2009-01-25}
   s.description = %q{Merb plugin that provides composition of controllers.}
   s.email = %q{genki@s21g.com}
   s.extra_rdoc_files = ["README", "LICENSE", "TODO"]
-  s.files = ["LICENSE", "README", "Rakefile", "TODO", "lib/merb_component", "lib/merb_component/controller_ext.rb", "lib/merb_component/merbtasks.rb", "lib/merb_component/model_ext.rb", "lib/merb_component.rb", "spec/merb_component_spec.rb", "spec/spec_helper.rb"]
+  s.files = ["LICENSE", "README", "Rakefile", "TODO", "lib/merb_component", "lib/merb_component/controller_ext.rb", "lib/merb_component/helper_ext.rb", "lib/merb_component/merbtasks.rb", "lib/merb_component/model_ext.rb", "lib/merb_component/resource_ext.rb", "lib/merb_component.rb", "spec/fixture", "spec/fixture/app", "spec/fixture/app/controllers", "spec/fixture/app/controllers/admin.rb", "spec/fixture/app/controllers/application.rb", "spec/fixture/app/controllers/comments.rb", "spec/fixture/app/controllers/posts.rb", "spec/fixture/app/models", "spec/fixture/app/models/comment.rb", "spec/fixture/app/models/post.rb", "spec/fixture/app/views", "spec/fixture/app/views/comments", "spec/fixture/app/views/comments/index.html.erb", "spec/fixture/app/views/comments/new.html.erb", "spec/fixture/app/views/posts", "spec/fixture/app/views/posts/index.html.erb", "spec/fixture/app/views/posts/show.html.erb", "spec/fixture/config", "spec/fixture/config/router.rb", "spec/fixture/tmp", "spec/merb_component_spec.rb", "spec/posts_spec.rb", "spec/spec_helper.rb"]
   s.has_rdoc = true
   s.homepage = %q{http://blog.s21g.com/genki}
   s.require_paths = ["lib"]

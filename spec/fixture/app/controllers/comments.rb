@@ -10,6 +10,16 @@ class Comments < Application
   end
 
   def create(comment)
-    Comment.all.create(comment)
+    @comment = Comment.all.create(comment)
+  end
+
+  def update(id, comment)
+    @comment = Comment.get(id)
+    @comment.update_attributes(comment)
+  end
+
+  def destroy(id)
+    @comment = Comment.get(id)
+    @comment.destroy
   end
 end
