@@ -17,17 +17,21 @@ end
 describe "Posts controller" do
   before :all do
     @post = Post.create
+    @comment = @post.comments.create
   end
 
   it "should be tested on at least one post" do
     Post.count.should > 0
+    Comment.count.should > 0
   end
 
   it "should show html" do
     res = request(resource(@post))
     res.should be_successful
     res.should have_xpath("//h1")
-    res.should have_xpath("//ul")
     res.should have_xpath("//h2")
+    res.should have_xpath("//ul/li")
+    res.should have_xpath("//form[@method='post']")
+    res.should have_xpath("//form[@action='/posts/#{@post.id}/comments']")
   end
 end

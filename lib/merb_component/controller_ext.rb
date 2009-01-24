@@ -17,4 +17,14 @@ private
     req.instance_variable_set :@params, params
     controller.new(req)._dispatch(action).render :layout => false
   end
+
+  def resource(first, *args)
+    model = case first
+    when Symbol, String
+      Object.full_const_get(first.to_s.singular.camel_case)
+    else first.class
+    end
+    return super unless model.relation
+    super(model.relation, first, *args)
+  end
 end

@@ -3,4 +3,9 @@ class Comments < Application
     @comments = Comment.all
     display @comments
   end
+
+  def new
+    @comment = Comment.build
+    display @comment
+  end
 end

@@ -1,3 +1,6 @@
 <h1><%= @post.id %></h1>
 
-<%= component Comments, :index %>
+<% Comment.related_with(@post) do %>
+  <%= component Comments, :index %>
+  <%= component Comments, :new %>
+<% end %>
