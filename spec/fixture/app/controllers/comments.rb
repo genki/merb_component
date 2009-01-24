@@ -1,0 +1,2 @@
+class Comments < Application
+end

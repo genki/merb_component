@@ -5,7 +5,7 @@ require 'merb-core'
 require 'merb-core/tasks/merb'
 
 GEM_NAME = "merb_component"
-GEM_VERSION = "0.1.1"
+GEM_VERSION = "0.1.2"
 AUTHOR = "Genki Takiuchi"
 EMAIL = "genki@s21g.com"
 HOMEPAGE = "http://blog.s21g.com/genki"
@@ -49,3 +49,10 @@ task :gemspec do
     file.puts spec.to_ruby
   end
 end
+
+desc "Run specs"
+task :spec do
+  sh "spec --color spec"
+end
+
+task :default => :spec
