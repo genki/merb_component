@@ -28,5 +28,6 @@ describe "Posts controller" do
     res.should be_successful
     res.should have_xpath("//h1")
     res.should have_xpath("//ul")
+    res.should have_xpath("//h2")
   end
 end
