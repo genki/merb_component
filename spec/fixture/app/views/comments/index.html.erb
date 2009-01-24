@@ -1,0 +1,7 @@
+<%= h_down "Comments" %>
+
+<ul>
+<% @comments.each do |comment| %>
+  <li><%= comment.id %></li>
+<% end %>
+</ul>
