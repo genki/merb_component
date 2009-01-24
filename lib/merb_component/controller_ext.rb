@@ -47,6 +47,9 @@ class Merb::Controller
 
 private
   def component(controller, action, params = {})
+    if controller.is_a?(Symbol)
+      controller = Object.full_const_get(controller.to_s.camel_case)
+    end
     req = request.dup
     req.reset_params!
     req.instance_variable_set :@params, params
