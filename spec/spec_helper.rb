@@ -10,7 +10,6 @@ require 'merb_component/model_ext'
 
 # this loads all plugins required in your init file so don't add them
 # here again, Merb will do it for you
-DataMapper::Model.append_extensions DataMapper::Has::Versions
 Merb.disable(:initfile)
 Merb.start_environment(
   :testing      => true,
