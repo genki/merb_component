@@ -11,6 +11,7 @@ dependency "dm-aggregates"
 dependency "merb-action-args"
 dependency "merb-helpers"
 dependency "merb-assets"
+dependency "dm-validations"
 
 use_orm :datamapper
 use_test :rspec

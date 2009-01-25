@@ -1,6 +1,6 @@
 class Merb::Controller
   METHOD_TO_ACTION = {
-    :get => :show,
+    :get => :edit,
     :post => :create,
     :put => :update,
     :delete => :destroy
@@ -34,7 +34,9 @@ class Merb::Controller
             begin
               layout = cc.class.default_layout
               cc.class.layout(options[:layout])
-              response = cc._abstract_dispatch(req.params[:action])
+              response = Aggregator.new(c, cc.class) do
+                cc._abstract_dispatch(req.params[:action])
+              end.result
             ensure
               cc.class.layout(layout)
             end
@@ -51,9 +53,55 @@ class Merb::Controller
     end
   end
 
+  class Aggregator
+    attr_reader :controller, :object, :result
+
+    def initialize(context, controller, &block)
+      @context = context
+      @controller = controller
+      @agg_name = @context.controller_name.singular.intern
+      model_class = Object.full_const_get(controller.name.singular)
+      @object = @context.instance_variable_get("@#{@agg_name}")
+      @scope = {}
+
+      if @object
+        relationship = model_class.relationships[@agg_name]
+        key_names = relationship.child_key.map{|i| i.name}
+        @scope = Hash[key_names.zip(@object.key)] if @object
+      end
+
+      @result = begin
+        Thread.critical = true
+        aggregators = Thread::current[:aggregators] ||= {}
+        (aggregators[controller] ||= []).push(self)
+        if model_class.respond_to?(:with_scope)
+          model_class.send(:with_scope, @scope, &block)
+        else
+          block.call
+        end
+      ensure
+        aggregators[controller].pop
+        Thread.critical = false
+      end
+    end
+
+    def resource(*args)
+      if (key = @object || @agg_name) && !(@controller <=> @context.class)
+        @context.send :resource, key, *args
+      else
+        @context.send :resource, *args
+      end
+    end
+  end
+
   def _abstract_dispatch(*args)
     _dispatch = Merb::AbstractController.instance_method(:_dispatch)
     _dispatch.bind(self).call(*args)
+  end
+
+  def aggregator
+    aggregators = Thread::current[:aggregators] ||= {}
+    (aggregators[self.class] ||= []).last
   end
 
 private
@@ -64,7 +112,10 @@ private
     req = request.dup
     req.reset_params!
     req.instance_variable_set :@params, params
-    controller.new(req)._dispatch(action).render :layout => false
+
+    Aggregator.new(self, controller) do
+      controller.new(req)._dispatch(action).render :layout => false
+    end.result
   end
 
   def resource(first, *args)
@@ -73,7 +124,7 @@ private
       Object.full_const_get(first.to_s.singular.camel_case)
     else first.class
     end
-    return super if !model.relation || model <= model.relation.class
-    super(model.relation, first, *args)
+    return super if !aggregator
+    aggregator.resource(first, *args)
   end
 end

@@ -45,6 +45,7 @@ describe "Posts controller" do
     res.should have_xpath("//ul/li[1]")
     res.should have_xpath("//ul/li[2]")
     res.should have_xpath("//form[@method='post']")
+    res.should have_xpath("//form[@action='/posts/#{@post.id}/comments']")
     res.should contain("foo")
     Comment.all(:post_id => @post.id).count.should == count + 1
   end
@@ -60,6 +61,7 @@ describe "Posts controller" do
     res.should have_xpath("//ul/li[1]")
     res.should have_xpath("//ul/li[2]")
     res.should have_xpath("//form[@method='post']")
+    res.should have_xpath("//form[@action='/posts/#{@post.id}/comments']")
     res.should contain("bar")
   end
 
@@ -71,6 +73,7 @@ describe "Posts controller" do
     res.should be_successful
     res.should have_xpath("//h1")
     res.should have_xpath("//h2")
+    res.should have_xpath("//form[@action='/posts/#{@post.id}/comments']")
     @post.comments.count.should == count - 1
   end
 end

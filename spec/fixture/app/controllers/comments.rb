@@ -4,13 +4,13 @@ class Comments < Application
     display @comments
   end
 
-  def show(id)
-    @comment = Comment.get(id)
+  def new
+    @comment = Comment.build
     display @comment
   end
 
-  def new
-    @comment = Comment.build
+  def edit(id)
+    @comment = Comment.get(id)
     display @comment
   end
 
