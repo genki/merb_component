@@ -12,6 +12,7 @@ if defined?(Merb::Plugins)
     require 'merb_component/model_ext'
     require 'merb_component/resource_ext'
     require 'merb_component/helper_ext'
+    require 'merb_component/router_ext'
   end
   
   Merb::BootLoader.after_app_loads do

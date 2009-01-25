@@ -5,14 +5,42 @@ Merb plugin that provides composition of controllers.
 
 Example of use:
 
-  Content of the user (id is 2) goes here
-  <%= component User, :show, :id => 2 %>
+  In config/router.rb:
 
-  Index of posts related with the @user go here
-  <% Post.related_with @user do %>
-    <%= component Post, :index %>
-  <% end %>
+    resources :posts do |post|
+      post.aggregates :comments
+    end
+    resource :admin, :controller => :admin do |admin|
+      admin.aggregates :comments
+    end
 
-  In app/views/posts/index.html.erb,
-  You can access to the corresponding relation like this
-  <%= Post.relation #=> @user %>
+  In controllers:
+
+    class Posts < Application
+      aggregates :comments
+
+    class Admin < Application
+      aggregates :show => :comments
+
+  In views:
+
+    Content of the user (id is 2) goes here
+    <%= component Users, :show, :id => 2 %>
+
+    Or, you can use symbol to specify subsidiary controller
+    <%= component :users, :show, :id => 2 %>
+
+    Index of posts related with the @user go here
+    <% Post.related_with @user do %>
+      <%= component Posts, :index %>
+    <% end %>
+
+    In app/views/posts/index.html.erb,
+    You can access to the corresponding relation like this
+    <%= Post.relation #=> @user %>
+
+  For detail, you can see spec/fixture as an example.
+
+  Enjoy!
+
+  Genki Takiuchi
