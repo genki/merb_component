@@ -53,6 +53,7 @@ describe "Admin controller" do
     res.should be_successful
     res.should have_xpath("//h1")
     res.should have_xpath("//h2")
+    res.should_not have_xpath("//body/meta")
     @post.comments.count.should == count - 1
   end
 end

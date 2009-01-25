@@ -2,6 +2,6 @@
 
 <ul>
 <% @comments.each do |comment| %>
-  <li><%= comment.body %></li>
+  <li><%= link_to h(comment.body), resource(comment) %></li>
 <% end %>
 </ul>

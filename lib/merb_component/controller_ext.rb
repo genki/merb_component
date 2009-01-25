@@ -56,7 +56,7 @@ private
     req = request.dup
     req.reset_params!
     req.instance_variable_set :@params, params
-    controller.new(req)._abstract_dispatch(action)
+    controller.new(req)._dispatch(action).render :layout => false
   end
 
   def resource(first, *args)
@@ -65,7 +65,7 @@ private
       Object.full_const_get(first.to_s.singular.camel_case)
     else first.class
     end
-    return super unless model.relation
+    return super if !model.relation || model <= model.relation.class
     super(model.relation, first, *args)
   end
 end

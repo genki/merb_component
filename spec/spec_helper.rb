@@ -10,6 +10,7 @@ dependency "dm-core"
 dependency "dm-aggregates"
 dependency "merb-action-args"
 dependency "merb-helpers"
+dependency "merb-assets"
 
 use_orm :datamapper
 use_test :rspec

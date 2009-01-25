@@ -11,16 +11,17 @@ module DataMapper::Model
   end
 
   def relation
-    (Thread::current[:relation] || []).last
+    relationship = (Thread::current[:relation] || {})
+    (relationship[self] || []).last
   end
 
 private
   def push_relation(relation)
-    Thread::current[:relation] ||= []
-    Thread::current[:relation].push relation
+    relationship = Thread::current[:relation] ||= {}
+    (relationship[self] ||= []).push relation
   end
 
   def pop_relation
-    Thread::current[:relation].pop
+    Thread::current[:relation][self].pop
   end
 end

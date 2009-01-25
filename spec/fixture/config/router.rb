@@ -1,4 +1,5 @@
 Merb::Router.prepare do
+  resources :comments
   resources :posts do |post|
     post.aggregates :comments
   end
