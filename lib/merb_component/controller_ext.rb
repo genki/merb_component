@@ -1,5 +1,6 @@
 class Merb::Controller
   METHOD_TO_ACTION = {
+    :get => :show,
     :post => :create,
     :put => :update,
     :delete => :destroy
@@ -30,7 +31,14 @@ class Merb::Controller
           scope = Mash.new
           scope[key] = id if id
           model.send :with_scope, scope do
-            cc._abstract_dispatch(req.params[:action])
+            begin
+              layout = cc.class.default_layout
+              cc.class.layout(options[:layout])
+              response = cc._abstract_dispatch(req.params[:action])
+            ensure
+              cc.class.layout(layout)
+            end
+            c.throw_content("from_#{arg}".intern, response)
             result = cc.instance_variable_get(var)
             c.instance_variable_set(var, result)
           end

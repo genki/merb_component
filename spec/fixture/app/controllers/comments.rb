@@ -4,6 +4,11 @@ class Comments < Application
     display @comments
   end
 
+  def show(id)
+    @comment = Comment.get(id)
+    display @comment
+  end
+
   def new
     @comment = Comment.build
     display @comment

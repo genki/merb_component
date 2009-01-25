@@ -56,4 +56,15 @@ describe "Admin controller" do
     res.should_not have_xpath("//body/meta")
     @post.comments.count.should == count - 1
   end
+
+  it "should show html after show a comment" do
+    comment = @post.comments.create
+    comment.should_not be_new_record
+    res = request(resource(:admin, comment), :method => 'GET')
+    res.should be_successful
+    res.should have_xpath("//h1")
+    res.should have_xpath("//h2")
+    res.should have_xpath("//h3")
+    res.should_not have_xpath("//body/meta")
+  end
 end
