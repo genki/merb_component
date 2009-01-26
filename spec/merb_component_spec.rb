@@ -11,15 +11,14 @@ describe "merb_component" do
     Post.public_methods.should_not be_include("related_with")
   end
 
-  it "should accept controller class as the first param of compoent" do
-    req = Merb::Request.new({})
-    result = Posts.new(req).send(:component, Comments, :index)
-    result.should be_kind_of(String)
-  end
-
   it "should accept symbol as the first param of compoent" do
     req = Merb::Request.new({})
-    result = Posts.new(req).send(:component, :comments, :index)
+    c = Posts.new(req)
+    proc do
+      c.send(:component, :comments, :index)
+    end.should raise_error(Merb::Router::GenerationError)
+    c.instance_variable_set(:@post, Post.create)
+    result = c.send(:component, :comments, :index)
     result.should be_kind_of(String)
   end
 end

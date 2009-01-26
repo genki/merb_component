@@ -1,4 +1,4 @@
 <h1>Admin</h1>
 
-<%= component :comments, :index %>
+<%= component :comments, :index, :page => params[:page] %>
 <%= form_for_component :comments %>

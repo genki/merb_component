@@ -25,13 +25,24 @@ describe "Admin controller" do
     Comment.count.should > 0
   end
 
-  it "should index html" do
+  it "should show index html" do
     res = request(resource(:admin))
     res.should be_successful
     res.should have_xpath("//h1")
     res.should have_xpath("//h2")
     res.should have_xpath("//ul/li")
     res.should_not have_xpath("//form")
+    res.should have_xpath("//a[@href='/admin/comments?page=1']")
+  end
+
+  it "should show index html for pagination params" do
+    res = request("/admin/comments?page=2")
+    res.should be_successful
+    res.should have_xpath("//h1")
+    res.should have_xpath("//h2")
+    res.should have_xpath("//ul")
+    res.should_not have_xpath("//form")
+    res.should have_xpath("//a[@href='/admin/comments?page=3']")
   end
 
   it "should show html after update a comment" do
@@ -39,14 +50,14 @@ describe "Admin controller" do
     comment.should be_kind_of(Comment)
     res = request(resource(:admin, comment),
       :method => 'PUT', :params => {:comment => {:body => "bar"}})
+    res.should redirect_to("/admin")
+
+    res = request(res.headers["Location"])
     res.should be_successful
     res.should have_xpath("//h1")
     res.should have_xpath("//h2")
     res.should have_xpath("//ul/li[1]")
-    res.should have_xpath("//form[@action='/admin/comments']")
-    res.should have_xpath("//form[@method='post']")
-    res.should_not have_xpath("//input[@value='put']")
-    res.should contain("bar")
+    res.should_not have_xpath("//form")
   end
 
   it "should show html after failed to update a comment" do
@@ -70,14 +81,13 @@ describe "Admin controller" do
     comment = @post.comments.last
     comment.should be_kind_of(Comment)
     res = request(resource(:admin, comment), :method => 'DELETE')
+    res.should redirect_to("/admin")
+    
+    res = request(res.headers["Location"])
     res.should be_successful
     res.should have_xpath("//h1")
     res.should have_xpath("//h2")
-    res.should have_xpath("//form")
-    res.should have_xpath("//form[@action='/admin/comments']")
-    res.should have_xpath("//form[@method='post']")
-    res.should_not have_xpath("//input[@value='put']")
-    res.should_not have_xpath("//body/meta")
+    res.should_not have_xpath("//form")
     @post.comments.count.should == count - 1
   end
 

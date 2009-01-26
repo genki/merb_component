@@ -35,12 +35,29 @@ describe "Posts controller" do
     res.should have_xpath("//form[@action='/posts/#{@post.id}/comments']")
     res.should_not have_xpath("//input[@value='put']")
     res.should have_xpath("//input[@value='new']")
+    res.should have_xpath("//a[@href='/posts/#{@post.id}/comments?page=1']")
   end
+
+  it "should show html for pagination params" do
+    res = request("/posts/#{@post.id}/comments?page=2")
+    res.should be_successful
+    res.should have_xpath("//h1")
+    res.should have_xpath("//h2")
+    res.should have_xpath("//ul/li")
+    res.should have_xpath("//form[@method='post']")
+    res.should have_xpath("//form[@action='/posts/#{@post.id}/comments']")
+    res.should_not have_xpath("//input[@value='put']")
+    res.should have_xpath("//input[@value='new']")
+    res.should have_xpath("//a[@href='/posts/#{@post.id}/comments?page=3']")
+    end
 
   it "should show html after post a comment" do
     count = @post.comments.count
     res = request(resource(@post, :comments),
       :method => 'POST', :params => {:comment => {:body => "foo"}})
+    res.should redirect_to("/posts/#{@post.id}")
+
+    res = request(res.headers["Location"])
     res.should be_successful
     res.should have_xpath("//h1")
     res.should have_xpath("//h2")
@@ -75,6 +92,9 @@ describe "Posts controller" do
     comment.should be_kind_of(Comment)
     res = request(resource(@post, comment),
       :method => 'PUT', :params => {:comment => {:body => "bar"}})
+    res.should redirect_to("/posts/#{@post.id}")
+
+    res = request(res.headers["Location"])
     res.should be_successful
     res.should have_xpath("//h1")
     res.should have_xpath("//h2")
@@ -109,6 +129,9 @@ describe "Posts controller" do
     comment = @post.comments.last
     comment.should be_kind_of(Comment)
     res = request(resource(@post, comment), :method => 'DELETE')
+    res.should redirect_to("/posts/#{@post.id}")
+    
+    res = request(res.headers["Location"])
     res.should be_successful
     res.should have_xpath("//h1")
     res.should have_xpath("//h2")

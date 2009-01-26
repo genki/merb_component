@@ -1,4 +1,4 @@
 <h1><%= link_to @post.id.to_s, resource(@post) %></h1>
 
-<%= component Comments, :index %>
+<%= component :comments, :index, :page => params[:page] %>
 <%= form_for_component :comments %>

@@ -58,8 +58,12 @@ class Merb::Controller
                 cc.class.layout(layout)
               end
               object = cc.instance_variable_get(var)
+              throw(:halt, proc{
+                target = controller_name.singular.intern
+                target = object.send(target) if object.respond_to?(target)
+                redirect resource(target)
+              }) if object.errors.empty?
               c.instance_variable_set(var, object)
-              object = model.new if object.errors.empty?
             end
           elsif params[:id]
             # GET with component id
@@ -77,7 +81,7 @@ class Merb::Controller
   end
 
   class Aggregator
-    attr_reader :controller, :object, :result
+    attr_reader :controller, :object, :result, :context
 
     def initialize(context, controller, &block)
       @context = context
@@ -125,6 +129,7 @@ class Merb::Controller
 
 private
   def component(controller, action, params = {})
+    params = {:controller => controller, :action => action}.merge(params)
     var = "@#{controller.to_s.singular}"
     object = instance_variable_get("#{var}_component")
     controller = Object.full_const_get(controller.to_s.camel_case)
@@ -156,8 +161,9 @@ private
     end
   end
 
-  def resource(first, *args)
-    return super unless aggregator
+  def resource_with_scope(first, *args)
+    agg = aggregator
+    return resource_without_scope(first, *args) unless agg
 
     controller = case first
     when Symbol, String
@@ -166,8 +172,23 @@ private
       Object.full_const_get(first.class.to_s.pluralize.camel_case)
     end
 
-    return super unless controller <=> aggregator.controller
-    return super unless key = aggregator.key
-    super(key, first, *args)
+    if controller <=> agg.controller && agg.key
+      resource_without_scope(agg.key, first, *args)
+    else
+      resource_without_scope(first, *args)
+    end
   end
+  alias_method :resource_without_scope, :resource
+  alias_method :resource, :resource_with_scope
+
+  def url_with_scope(*args)
+    result = url_without_scope(*args)
+    if (agg = aggregator) && (key = agg.key)
+      resource_without_scope(key) + result
+    else
+      result
+    end
+  end
+  alias_method :url_without_scope, :url
+  alias_method :url, :url_with_scope
 end
