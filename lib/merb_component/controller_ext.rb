@@ -53,7 +53,7 @@ class Merb::Controller
               begin
                 layout = cc.class.default_layout
                 cc.class.layout(options[:layout])
-                response = cc._abstract_dispatch(action)
+                cc._abstract_dispatch(action)
               ensure
                 cc.class.layout(layout)
               end
@@ -167,12 +167,17 @@ private
     req.reset_params!
     req.instance_variable_set :@params, params
 
-    Aggregator.new(self, controller) do
+    Aggregator.new(this = self, controller) do
       controller.new(req)._dispatch(action).instance_eval do
         if object
           original = instance_variable_get(var)
           object.attributes = original.attributes if original
           instance_variable_set(var, object)
+        end
+        cc = this.instance_variable_get(:@_caught_content)
+        instance_variable_get(:@_caught_content).each do |k, v|
+          next if k == :for_layout
+          cc[k].nil? ? this.throw_content(k, v) : this.append_content(k, v)
         end
         render :layout => false
       end

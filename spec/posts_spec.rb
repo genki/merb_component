@@ -36,6 +36,7 @@ describe "Posts controller" do
     res.should_not have_xpath("//input[@value='put']")
     res.should have_xpath("//input[@value='new']")
     res.should have_xpath("//a[@href='/posts/#{@post.id}/comments?page=1']")
+    res.should contain("test_content")
   end
 
   it "should show html for pagination params" do

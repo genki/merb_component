@@ -9,3 +9,7 @@
 </ul>
 
 <%= link_to "next", url(:page => params[:page].to_i + 1) %>
+
+<% throw_content :for_post do %>
+  test_content
+<% end %>
