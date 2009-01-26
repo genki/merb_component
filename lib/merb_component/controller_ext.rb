@@ -7,6 +7,22 @@ class Merb::Controller
 
   class << self
   private
+    def is_component(resource = nil)
+      resource = controller_name.singular if resource.nil?
+      r, m = resource, resource.camel_case
+      iv = proc{|i| "(@#{r} = #{m}.#{i})"}
+      ivs = proc{|i| "(@#{r.pluralize} = #{m}.#{i})"}
+      class_eval <<-"RUBY"
+        def index; display #{ivs["all"]} end
+        def show(id) display #{iv["get(id)"]} end
+        def new; display #{iv["new"]} end
+        def edit(id) display #{iv["get(id)"]} end
+        def create(#{r}) #{iv["create(#{r})"]} end
+        def update(id,#{r}) #{iv["get(id)"]}.update_attributes(#{r}) end
+        def destroy(id) #{iv["get(id)"]}.destroy end
+      RUBY
+    end
+
     def aggregates(aggregation, options = {})
       if aggregation.is_a?(Symbol)
         aggregation = {:show => aggregation}

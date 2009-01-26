@@ -1,4 +1,6 @@
 class Comments < Application
+  is_component
+=begin
   def index
     @comments = Comment.all
     display @comments
@@ -15,7 +17,7 @@ class Comments < Application
   end
 
   def create(comment)
-    @comment = Comment.all.create(comment)
+    @comment = Comment.create(comment)
   end
 
   def update(id, comment)
@@ -27,4 +29,5 @@ class Comments < Application
     @comment = Comment.get(id)
     @comment.destroy
   end
+=end
 end
