@@ -5,6 +5,8 @@ describe "merb_component" do
     Posts.private_instance_methods.should be_include("component")
     Posts.private_instance_methods.should be_include("form_for_component")
     Posts.instance_methods.should be_include("aggregator")
+    Posts.private_instance_methods.should be_include("resource")
+    Posts.public_instance_methods.should be_include("url")
   end
 
   it "should not extend model" do

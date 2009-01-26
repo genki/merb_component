@@ -127,9 +127,22 @@ class Merb::Controller
     (aggregators[self.class] ||= []).last
   end
 
+  def url_with_scope(*args)
+    result = url_without_scope(*args)
+    if (agg = aggregator) && (key = agg.key)
+      resource_without_scope(key) + result
+    else
+      result
+    end
+  end
+  alias_method :url_without_scope, :url
+  alias_method :url, :url_with_scope
+
 private
   def component(controller, action, params = {})
-    params = {:controller => controller, :action => action}.merge(params)
+    params = self.params.merge(
+      :controller => controller, :action => action
+    ).merge(params)
     var = "@#{controller.to_s.singular}"
     object = instance_variable_get("#{var}_component")
     controller = Object.full_const_get(controller.to_s.camel_case)
@@ -180,15 +193,4 @@ private
   end
   alias_method :resource_without_scope, :resource
   alias_method :resource, :resource_with_scope
-
-  def url_with_scope(*args)
-    result = url_without_scope(*args)
-    if (agg = aggregator) && (key = agg.key)
-      resource_without_scope(key) + result
-    else
-      result
-    end
-  end
-  alias_method :url_without_scope, :url
-  alias_method :url, :url_with_scope
 end
