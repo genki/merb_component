@@ -52,6 +52,23 @@ describe "Posts controller" do
     Comment.all(:post_id => @post.id).count.should == count + 1
   end
 
+  it "should show html after failed to post a comment" do
+    count = Comment.all(:post_id => @post.id).count
+    res = request(resource(@post, :comments),
+      :method => 'POST', :params => {:comment => {:body => ""}})
+    res.should be_successful
+    res.should have_xpath("//h1")
+    res.should have_xpath("//h2")
+    res.should have_xpath("//ul/li[1]")
+    res.should have_xpath("//ul/li[2]")
+    res.should have_xpath("//form[@method='post']")
+    res.should have_xpath("//form[@action='/posts/#{@post.id}/comments']")
+    res.should_not have_xpath("//input[@value='put']")
+    res.should have_tag("div.error")
+    res.should have_tag("input.error[@name='comment[body]']")
+    Comment.all(:post_id => @post.id).count.should == count
+  end
+
   it "should show html after update a comment" do
     comment = @post.comments.last
     comment.should be_kind_of(Comment)
@@ -66,6 +83,24 @@ describe "Posts controller" do
     res.should have_xpath("//form[@action='/posts/#{@post.id}/comments']")
     res.should_not have_xpath("//input[@value='put']")
     res.should contain("bar")
+  end
+
+  it "should show html after failed to update a comment" do
+    comment = @post.comments.last
+    comment.should be_kind_of(Comment)
+    res = request(resource(@post, comment),
+      :method => 'PUT', :params => {:comment => {:body => ""}})
+    res.should be_successful
+    res.should have_xpath("//h1")
+    res.should have_xpath("//h2")
+    res.should have_xpath("//ul/li[1]")
+    res.should have_xpath("//ul/li[2]")
+    res.should have_xpath("//form[@method='post']")
+    url = "/posts/#{@post.id}/comments/#{comment.id}"
+    res.should have_xpath("//form[@action='#{url}']")
+    res.should have_xpath("//input[@value='put']")
+    res.should have_tag("div.error")
+    res.should have_tag("input.error[@name='comment[body]']")
   end
 
   it "should show html after delete a comment" do

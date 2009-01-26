@@ -5,7 +5,7 @@ class Comments < Application
   end
 
   def new
-    @comment = Comment.build
+    @comment = Comment.new
     display @comment
   end
 

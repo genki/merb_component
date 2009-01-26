@@ -42,7 +42,7 @@ class Merb::Controller
               end
               object = cc.instance_variable_get(var)
               c.instance_variable_set(var, object)
-              object = model.build
+              object = model.new if object.errors.empty?
             end
           elsif params[:id]
             # GET with component id
@@ -108,13 +108,18 @@ class Merb::Controller
 
 private
   def component(controller, action, params = {})
+    var = "@#{controller.to_s.singular}"
+    object = instance_variable_get("#{var}_component")
     controller = Object.full_const_get(controller.to_s.camel_case)
     req = request.dup
     req.reset_params!
     req.instance_variable_set :@params, params
 
     Aggregator.new(self, controller) do
-      controller.new(req)._dispatch(action).render :layout => false
+      controller.new(req)._dispatch(action).instance_eval do
+        instance_variable_set(var, object)
+        render :layout => false
+      end
     end.result
   end
 

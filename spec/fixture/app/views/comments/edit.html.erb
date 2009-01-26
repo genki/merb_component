@@ -3,6 +3,8 @@
   <%= link_to h(@comment.post.id), resource(@comment.post) %>
 </h3>
 
+<%= error_messages_for @comment %>
+
 <%= form_for @comment, :action => resource(@comment), :method => :put do %>
   <%= text_field :body %>
   <%= submit "Submit" %>
