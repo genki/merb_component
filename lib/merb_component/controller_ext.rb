@@ -45,6 +45,7 @@ class Merb::Controller
               object = model.build
             end
           elsif params[:id]
+            # GET with component id
             object = model.get(params[:id])
             c.instance_variable_set(var, object)
           end

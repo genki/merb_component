@@ -17,7 +17,7 @@ end
 describe "Posts controller" do
   before :all do
     @post = Post.create
-    @comment = @post.comments.create
+    @comment = @post.comments.create(:body => "test")
   end
 
   it "should be tested on at least one post" do
@@ -83,7 +83,7 @@ describe "Posts controller" do
   end
 
   it "should show html after show a comment" do
-    comment = @post.comments.create
+    comment = @post.comments.create(:body => "test")
     comment.should_not be_new_record
     res = request(resource(@post, comment), :method => 'GET')
     res.should be_successful

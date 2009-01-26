@@ -5,4 +5,6 @@ class Comment
   property :body, Text
   
   belongs_to :post
+
+  validates_present :body
 end

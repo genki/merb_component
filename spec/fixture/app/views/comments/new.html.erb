@@ -1,3 +1,5 @@
+<%= error_messages_for @comment %>
+
 <%= form_for @comment, :action => resource(:comments) do %>
   <%= text_field :body %>
   <%= submit "submit" %>
