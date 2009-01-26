@@ -8,6 +8,7 @@ class Posts < Application
 
   def show(id)
     @post = Post.get(id)
+    @comment = @post.comments.build
     display @post
   end
 end

@@ -1,6 +1,5 @@
 class Merb::Controller
   METHOD_TO_ACTION = {
-    :get => :edit,
     :post => :create,
     :put => :update,
     :delete => :destroy
@@ -12,42 +11,48 @@ class Merb::Controller
       if aggregation.is_a?(Symbol)
         aggregation = {:show => aggregation}
       end
-      aggregation.each do |action, arg|
+      aggregation.each do |agg_action, arg|
         define_method(arg){} unless method_defined?(arg)
         model = Object.full_const_get(arg.to_s.singular.camel_case)
         key = "#{controller_name.singular}_id"
         var = "@#{arg.to_s.singular}"
 
         add_filter(_before_filters, proc{|c|
-          # setup request
           id = params.delete(key)
-          req = request.dup
-          req.reset_params!
-          req.instance_variable_set(:@params, params.merge(
-            :controller => arg, :action => METHOD_TO_ACTION[req.method]))
-
-          # call action of subsidiary controller with scope
-          cc = Object.full_const_get(params[:action].camel_case).new(req)
+          method = request.method
           scope = Mash.new
           scope[key] = id if id
-          model.send :with_scope, scope do
-            begin
-              layout = cc.class.default_layout
-              cc.class.layout(options[:layout])
-              response = Aggregator.new(c, cc.class) do
-                cc._abstract_dispatch(req.params[:action])
-              end.result
-            ensure
-              cc.class.layout(layout)
+          object = nil
+          if action = METHOD_TO_ACTION[method]
+            # setup request
+            req = request.dup
+            req.reset_params!
+            req.instance_variable_set(:@params,
+              params.merge(:controller => arg, :action => action))
+
+            # call action of subsidiary controller with scope
+            cc = Object.full_const_get(params[:action].camel_case).new(req)
+            model.send :with_scope, scope do
+              begin
+                layout = cc.class.default_layout
+                cc.class.layout(options[:layout])
+                response = cc._abstract_dispatch(action)
+              ensure
+                cc.class.layout(layout)
+              end
+              object = cc.instance_variable_get(var)
+              c.instance_variable_set(var, object)
+              object = model.build
             end
-            c.throw_content("from_#{arg}".intern, response)
-            result = cc.instance_variable_get(var)
-            c.instance_variable_set(var, result)
+          elsif params[:id]
+            object = model.get(params[:id])
+            c.instance_variable_set(var, object)
           end
+          c.instance_variable_set("#{var}_component", object)
 
           # prepare for performing actoin of principal controller
-          params[:id] = id if id
-          params[:action] = c.action_name = action
+          c.params[:id] = id if id
+          c.params[:action] = c.action_name = agg_action.to_s
         }, :only => arg)
       end
     end
@@ -85,12 +90,8 @@ class Merb::Controller
       end
     end
 
-    def resource(*args)
-      if (key = @object || @agg_name) && !(@controller <=> @context.class)
-        @context.send :resource, key, *args
-      else
-        @context.send :resource, *args
-      end
+    def key
+      @object || @agg_name
     end
   end
 
@@ -106,9 +107,7 @@ class Merb::Controller
 
 private
   def component(controller, action, params = {})
-    if controller.is_a?(Symbol)
-      controller = Object.full_const_get(controller.to_s.camel_case)
-    end
+    controller = Object.full_const_get(controller.to_s.camel_case)
     req = request.dup
     req.reset_params!
     req.instance_variable_set :@params, params
@@ -118,13 +117,30 @@ private
     end.result
   end
 
-  def resource(first, *args)
-    model = case first
-    when Symbol, String
-      Object.full_const_get(first.to_s.singular.camel_case)
-    else first.class
+  def form_for_component(controller, params = {}, &block)
+    var = "@#{controller.to_s.singular}"
+    object = instance_variable_get(var)
+    return nil if object.nil?
+    object = instance_variable_get("#{var}_component") || object
+    if object.new_record?
+      component(controller, :new, params)
+    else
+      component(controller, :edit, {:id => object.id}.merge(params))
     end
-    return super if !aggregator
-    aggregator.resource(first, *args)
+  end
+
+  def resource(first, *args)
+    return super unless aggregator
+
+    controller = case first
+    when Symbol, String
+      Object.full_const_get(first.to_s.camel_case)
+    else
+      Object.full_const_get(first.class.to_s.pluralize.camel_case)
+    end
+
+    return super unless controller <=> aggregator.controller
+    return super unless key = aggregator.key
+    super(key, first, *args)
   end
 end

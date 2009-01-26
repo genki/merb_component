@@ -33,6 +33,7 @@ describe "Posts controller" do
     res.should have_xpath("//ul/li")
     res.should have_xpath("//form[@method='post']")
     res.should have_xpath("//form[@action='/posts/#{@post.id}/comments']")
+    res.should_not have_xpath("//input[@value='put']")
   end
 
   it "should show html after post a comment" do
@@ -46,6 +47,7 @@ describe "Posts controller" do
     res.should have_xpath("//ul/li[2]")
     res.should have_xpath("//form[@method='post']")
     res.should have_xpath("//form[@action='/posts/#{@post.id}/comments']")
+    res.should_not have_xpath("//input[@value='put']")
     res.should contain("foo")
     Comment.all(:post_id => @post.id).count.should == count + 1
   end
@@ -62,10 +64,11 @@ describe "Posts controller" do
     res.should have_xpath("//ul/li[2]")
     res.should have_xpath("//form[@method='post']")
     res.should have_xpath("//form[@action='/posts/#{@post.id}/comments']")
+    res.should_not have_xpath("//input[@value='put']")
     res.should contain("bar")
   end
 
-  it "should show html after update a comment" do
+  it "should show html after delete a comment" do
     count = @post.comments.count
     comment = @post.comments.last
     comment.should be_kind_of(Comment)
@@ -74,6 +77,23 @@ describe "Posts controller" do
     res.should have_xpath("//h1")
     res.should have_xpath("//h2")
     res.should have_xpath("//form[@action='/posts/#{@post.id}/comments']")
+    res.should have_xpath("//form[@method='post']")
+    res.should_not have_xpath("//input[@value='put']")
     @post.comments.count.should == count - 1
+  end
+
+  it "should show html after show a comment" do
+    comment = @post.comments.create
+    comment.should_not be_new_record
+    res = request(resource(@post, comment), :method => 'GET')
+    res.should be_successful
+    res.should have_xpath("//h1")
+    res.should have_xpath("//h2")
+    url = "/posts/#{@post.id}/comments/#{comment.id}"
+    res.should have_xpath("//form[@action='#{url}']")
+    res.should have_xpath("//input[@value='put']")
+    res.should_not have_xpath("//body/meta")
+
+    pending "should check pagination"
   end
 end

@@ -1,6 +1,9 @@
-<h3>Comment</h3>
+<h3>
+  Edit Comment of 
+  <%= link_to h(@comment.post.id), resource(@comment.post) %>
+</h3>
 
 <%= form_for @comment, :action => resource(@comment), :method => :put do %>
   <%= text_field :body %>
-  <%= submit "Submia" %>
+  <%= submit "Submit" %>
 <% end =%>

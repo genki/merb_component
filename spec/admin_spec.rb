@@ -31,6 +31,7 @@ describe "Admin controller" do
     res.should have_xpath("//h1")
     res.should have_xpath("//h2")
     res.should have_xpath("//ul/li")
+    res.should_not have_xpath("//form")
   end
 
   it "should show html after update a comment" do
@@ -42,10 +43,13 @@ describe "Admin controller" do
     res.should have_xpath("//h1")
     res.should have_xpath("//h2")
     res.should have_xpath("//ul/li[1]")
+    res.should have_xpath("//form[@action='/admin/comments']")
+    res.should have_xpath("//form[@method='post']")
+    res.should_not have_xpath("//input[@value='put']")
     res.should contain("bar")
   end
 
-  it "should show html after update a comment" do
+  it "should show html after delete a comment" do
     count = @post.comments.count
     comment = @post.comments.last
     comment.should be_kind_of(Comment)
@@ -53,7 +57,10 @@ describe "Admin controller" do
     res.should be_successful
     res.should have_xpath("//h1")
     res.should have_xpath("//h2")
-    res.should_not have_xpath("//form")
+    res.should have_xpath("//form")
+    res.should have_xpath("//form[@action='/admin/comments']")
+    res.should have_xpath("//form[@method='post']")
+    res.should_not have_xpath("//input[@value='put']")
     res.should_not have_xpath("//body/meta")
     @post.comments.count.should == count - 1
   end
@@ -65,8 +72,9 @@ describe "Admin controller" do
     res.should be_successful
     res.should have_xpath("//h1")
     res.should have_xpath("//h2")
-    res.should have_xpath("//h3")
     res.should have_xpath("//form[@action='/admin/comments/#{comment.id}']")
+    res.should have_xpath("//form[@method='post']")
+    res.should have_xpath("//input[@value='put']")
     res.should_not have_xpath("//body/meta")
   end
 end
