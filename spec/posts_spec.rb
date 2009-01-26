@@ -34,6 +34,7 @@ describe "Posts controller" do
     res.should have_xpath("//form[@method='post']")
     res.should have_xpath("//form[@action='/posts/#{@post.id}/comments']")
     res.should_not have_xpath("//input[@value='put']")
+    res.should have_xpath("//input[@value='new']")
   end
 
   it "should show html after post a comment" do
@@ -128,6 +129,7 @@ describe "Posts controller" do
     res.should have_xpath("//form[@action='#{url}']")
     res.should have_xpath("//input[@value='put']")
     res.should_not have_xpath("//body/meta")
+    res.should have_xpath("//input[@value='edit']")
 
     pending "should check pagination"
   end

@@ -9,7 +9,8 @@ class Merb::Controller
   private
     def is_component(resource = nil)
       resource = controller_name.singular if resource.nil?
-      r, m = resource, resource.camel_case
+      r = resource.to_s
+      m = r.camel_case
       iv = proc{|i| "(@#{r} = #{m}.#{i})"}
       ivs = proc{|i| "(@#{r.pluralize} = #{m}.#{i})"}
       class_eval <<-"RUBY"
@@ -133,7 +134,11 @@ private
 
     Aggregator.new(self, controller) do
       controller.new(req)._dispatch(action).instance_eval do
-        instance_variable_set(var, object)
+        if object
+          original = instance_variable_get(var)
+          object.attributes = original.attributes if original
+          instance_variable_set(var, object)
+        end
         render :layout => false
       end
     end.result
