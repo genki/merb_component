@@ -1,5 +1,6 @@
 class Comments < Application
   is_component :comment
+  provides :atom, :only => :index
 
   def new
     @comment = Comment.new

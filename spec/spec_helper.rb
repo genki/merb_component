@@ -12,6 +12,8 @@ dependency "merb-action-args"
 dependency "merb-helpers"
 dependency "merb-assets"
 dependency "dm-validations"
+dependency "merb-builder"
+dependency "merb_full_url"
 
 use_orm :datamapper
 use_test :rspec
@@ -28,6 +30,7 @@ Merb.start_environment(
   :log_file     => File.dirname(__FILE__) / '..' / "merb_test.log"
 )
 DataMapper.setup(:default, "sqlite3::memory:")
+Merb.add_mime_type(:atom, :to_atom, %w[application/atom+xml])
 
 Spec::Runner.configure do |config|
   config.include(Merb::Test::ViewHelper)

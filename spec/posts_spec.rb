@@ -156,4 +156,17 @@ describe "Posts controller" do
 
     pending "should check pagination"
   end
+
+  it "should provide atom feed for comments" do
+    comment = @post.comments.create(:body => "test")
+    comment.should_not be_new_record
+    res = request(resource(@post, :comments, :format => :atom))
+    res.should be_successful
+    res.should have_xpath("//feed/title")
+    url = "http://example.org/posts/#{@post.id}/comments"
+    res.should have_xpath("//feed/link[@href='#{url}']")
+    res.should have_xpath("//entry/title")
+    url = "http://example.org/posts/#{@post.id}/comments/#{comment.id}"
+    res.should have_xpath("//entry/link[@href='#{url}']")
+  end
 end

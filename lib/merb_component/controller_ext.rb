@@ -69,6 +69,9 @@ class Merb::Controller
             # GET with component id
             object = model.get(params[:id])
             c.instance_variable_set(var, object)
+          elsif params[:format]
+            @component_format = params.delete(:format)
+            #c._abstract_dispatch(action)
           end
           c.instance_variable_set("#{var}_component", object)
 
@@ -76,6 +79,20 @@ class Merb::Controller
           c.params[:id] = id if id
           c.params[:action] = c.action_name = agg_action.to_s
         }, :only => arg)
+
+        add_filter(_after_filters, proc{|c|
+          # setup request
+          request.reset_params!
+          request.instance_variable_set(:@params, params.merge(
+            :controller => arg, :action => :index,
+            :format => @component_format))
+
+          # call index action of subsidiary controller with scope
+          cc = Object.full_const_get(arg.to_s.camel_case).new(request)
+          @body = Aggregator.new(c, cc.class) do
+            cc._abstract_dispatch(:index)
+          end.result
+        }, :only => agg_action, :if => proc{@component_format})
       end
     end
   end
