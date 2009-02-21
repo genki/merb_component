@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{merb_component}
-  s.version = "0.2.1"
+  s.version = "0.2.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Genki Takiuchi"]
-  s.date = %q{2009-01-27}
+  s.date = %q{2009-02-22}
   s.description = %q{Merb plugin that provides composition of controllers.}
   s.email = %q{genki@s21g.com}
   s.extra_rdoc_files = ["README", "LICENSE", "TODO"]

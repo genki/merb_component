@@ -115,7 +115,6 @@ class Merb::Controller
       end
 
       @result = begin
-        Thread.critical = true
         aggregators = Thread::current[:aggregators] ||= {}
         (aggregators[controller] ||= []).push(self)
         if model_class.respond_to?(:with_scope)
@@ -125,7 +124,6 @@ class Merb::Controller
         end
       ensure
         aggregators[controller].pop
-        Thread.critical = false
       end
     end
 
