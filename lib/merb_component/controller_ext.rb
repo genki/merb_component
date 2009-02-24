@@ -17,10 +17,10 @@ class Merb::Controller
         def index; display #{ivs["all"]} end
         def show(id) display #{iv["get(id)"]} end
         def new; display #{iv["new"]} end
-        def edit(id) display #{iv["get(id)"]} end
-        def create(#{r}) #{iv["create(#{r})"]} end
-        def update(id,#{r}) #{iv["get(id)"]}.update_attributes(#{r}) end
-        def destroy(id) #{iv["get(id)"]}.destroy end
+        def edit(id) display #{iv["get(id)"]}; end
+        def create(#{r}) #{iv["create(#{r})"]}; '' end
+        def update(id,#{r}) #{iv["get(id)"]}.update_attributes(#{r}); '' end
+        def destroy(id) #{iv["get(id)"]}.destroy; '' end
       RUBY
     end
 
