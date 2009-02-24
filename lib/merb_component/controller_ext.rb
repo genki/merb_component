@@ -108,8 +108,9 @@ class Merb::Controller
       @object = @context.instance_variable_get("@#{@agg_name}")
       @scope = {}
 
-      if @object
-        relationship = model_class.relationships[@agg_name]
+      relationship = model_class.relationships[@agg_name]
+      if @object && relationship
+        Merb.logger.debug [model_class, @agg_name].inspect
         key_names = relationship.child_key.map{|i| i.name}
         @scope = Hash[key_names.zip(@object.key)] if @object
       end
