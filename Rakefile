@@ -9,6 +9,7 @@ GEM_VERSION = "0.2.3"
 AUTHOR = "Genki Takiuchi"
 EMAIL = "genki@s21g.com"
 HOMEPAGE = "http://blog.s21g.com/genki"
+RUBYFORGE_PROJECT = 'asakusarb'
 SUMMARY = "Merb plugin that provides composition of controllers."
 
 spec = Gem::Specification.new do |s|
@@ -31,6 +32,7 @@ spec = Gem::Specification.new do |s|
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|
+	pkg.need_tar = true
   pkg.gem_spec = spec
 end
 
@@ -54,6 +56,32 @@ end
 desc "Run specs"
 task :spec do
   sh "spec --color spec"
+end
+
+desc 'Package and upload the release to rubyforge.'
+task :release => :package do |t|
+  require 'rubyforge'
+	v = ENV["VERSION"] or abort "Must supply VERSION=x.y.z"
+	abort "Versions don't match #{v} vs #{GEM_VERSION}" unless v == GEM_VERSION
+	pkg = "pkg/#{GEM_NAME}-#{GEM_VERSION}"
+
+	require 'rubyforge'
+	rf = RubyForge.new.configure
+	puts "Logging in"
+	rf.login
+
+	c = rf.userconfig
+#	c["release_notes"] = description if description
+#	c["release_changes"] = changes if changes
+	c["preformatted"] = true
+
+	files = [
+		"#{pkg}.tgz",
+		"#{pkg}.gem"
+	].compact
+
+	puts "Releasing #{GEM_NAME} v. #{GEM_VERSION}"
+	rf.add_release RUBYFORGE_PROJECT, GEM_NAME, GEM_VERSION, *files
 end
 
 task :default => :spec
